@@ -1,0 +1,273 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "e506412f",
+   "metadata": {
+    "_cell_guid": "b1076dfc-b9ad-4769-8c92-a6c4dae69d19",
+    "_uuid": "8f2839f25d086af736a60e9eeb907d3b93b6e0e5",
+    "execution": {
+     "iopub.execute_input": "2025-04-21T08:17:21.058277Z",
+     "iopub.status.busy": "2025-04-21T08:17:21.057978Z",
+     "iopub.status.idle": "2025-04-21T08:17:22.801922Z",
+     "shell.execute_reply": "2025-04-21T08:17:22.800888Z"
+    },
+    "papermill": {
+     "duration": 1.748389,
+     "end_time": "2025-04-21T08:17:22.803327",
+     "exception": false,
+     "start_time": "2025-04-21T08:17:21.054938",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "/kaggle/input/steam-alternator-generator-log-2005-synthetic/data_dictionary.csv\n",
+      "/kaggle/input/steam-alternator-generator-log-2005-synthetic/steam_alternator_generator_log-2025.csv\n"
+     ]
+    }
+   ],
+   "source": [
+    "# This Python 3 environment comes with many helpful analytics libraries installed\n",
+    "# It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python\n",
+    "# For example, here's several helpful packages to load\n",
+    "\n",
+    "import numpy as np # linear algebra\n",
+    "import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)\n",
+    "\n",
+    "# Input data files are available in the read-only \"../input/\" directory\n",
+    "# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory\n",
+    "\n",
+    "import os\n",
+    "for dirname, _, filenames in os.walk('/kaggle/input'):\n",
+    "    for filename in filenames:\n",
+    "        print(os.path.join(dirname, filename))\n",
+    "\n",
+    "# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using \"Save & Run All\" \n",
+    "# You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "0ed4a8b3",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2025-04-21T08:17:22.807621Z",
+     "iopub.status.busy": "2025-04-21T08:17:22.807213Z",
+     "iopub.status.idle": "2025-04-21T08:17:22.887155Z",
+     "shell.execute_reply": "2025-04-21T08:17:22.886212Z"
+    },
+    "papermill": {
+     "duration": 0.083686,
+     "end_time": "2025-04-21T08:17:22.888772",
+     "exception": false,
+     "start_time": "2025-04-21T08:17:22.805086",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>LogDate</th>\n",
+       "      <th>LogTime</th>\n",
+       "      <th>V</th>\n",
+       "      <th>Amp</th>\n",
+       "      <th>W</th>\n",
+       "      <th>Pf</th>\n",
+       "      <th>Hz</th>\n",
+       "      <th>Mech_Load</th>\n",
+       "      <th>GenBearing_DE_Temp</th>\n",
+       "      <th>GenBearing_NDE_Temp</th>\n",
+       "      <th>AltBearing_DE_Temp</th>\n",
+       "      <th>AltBearing_NDE_Temp</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>01-01-2025</td>\n",
+       "      <td>00:00:00</td>\n",
+       "      <td>440.0</td>\n",
+       "      <td>1331.652355</td>\n",
+       "      <td>811.860502</td>\n",
+       "      <td>0.8</td>\n",
+       "      <td>50.0</td>\n",
+       "      <td>54.124033</td>\n",
+       "      <td>71.156934</td>\n",
+       "      <td>57.504529</td>\n",
+       "      <td>83.319727</td>\n",
+       "      <td>69.601118</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>01-01-2025</td>\n",
+       "      <td>01:00:00</td>\n",
+       "      <td>440.0</td>\n",
+       "      <td>1474.153008</td>\n",
+       "      <td>898.738019</td>\n",
+       "      <td>0.8</td>\n",
+       "      <td>50.0</td>\n",
+       "      <td>59.915868</td>\n",
+       "      <td>78.444319</td>\n",
+       "      <td>56.460995</td>\n",
+       "      <td>78.598566</td>\n",
+       "      <td>84.730030</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>01-01-2025</td>\n",
+       "      <td>02:00:00</td>\n",
+       "      <td>440.0</td>\n",
+       "      <td>1202.375502</td>\n",
+       "      <td>733.045058</td>\n",
+       "      <td>0.8</td>\n",
+       "      <td>50.0</td>\n",
+       "      <td>48.869671</td>\n",
+       "      <td>54.769791</td>\n",
+       "      <td>54.177022</td>\n",
+       "      <td>60.402790</td>\n",
+       "      <td>50.870855</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>01-01-2025</td>\n",
+       "      <td>03:00:00</td>\n",
+       "      <td>440.0</td>\n",
+       "      <td>1881.437220</td>\n",
+       "      <td>1147.044541</td>\n",
+       "      <td>0.8</td>\n",
+       "      <td>50.0</td>\n",
+       "      <td>76.469636</td>\n",
+       "      <td>81.127332</td>\n",
+       "      <td>81.087021</td>\n",
+       "      <td>68.949176</td>\n",
+       "      <td>69.419280</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>01-01-2025</td>\n",
+       "      <td>04:00:00</td>\n",
+       "      <td>440.0</td>\n",
+       "      <td>1298.141923</td>\n",
+       "      <td>791.430397</td>\n",
+       "      <td>0.8</td>\n",
+       "      <td>50.0</td>\n",
+       "      <td>52.762026</td>\n",
+       "      <td>77.960658</td>\n",
+       "      <td>72.196024</td>\n",
+       "      <td>86.902454</td>\n",
+       "      <td>84.606845</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "      LogDate   LogTime      V          Amp            W   Pf    Hz  \\\n",
+       "0  01-01-2025  00:00:00  440.0  1331.652355   811.860502  0.8  50.0   \n",
+       "1  01-01-2025  01:00:00  440.0  1474.153008   898.738019  0.8  50.0   \n",
+       "2  01-01-2025  02:00:00  440.0  1202.375502   733.045058  0.8  50.0   \n",
+       "3  01-01-2025  03:00:00  440.0  1881.437220  1147.044541  0.8  50.0   \n",
+       "4  01-01-2025  04:00:00  440.0  1298.141923   791.430397  0.8  50.0   \n",
+       "\n",
+       "   Mech_Load  GenBearing_DE_Temp  GenBearing_NDE_Temp  AltBearing_DE_Temp  \\\n",
+       "0  54.124033           71.156934            57.504529           83.319727   \n",
+       "1  59.915868           78.444319            56.460995           78.598566   \n",
+       "2  48.869671           54.769791            54.177022           60.402790   \n",
+       "3  76.469636           81.127332            81.087021           68.949176   \n",
+       "4  52.762026           77.960658            72.196024           86.902454   \n",
+       "\n",
+       "   AltBearing_NDE_Temp  \n",
+       "0            69.601118  \n",
+       "1            84.730030  \n",
+       "2            50.870855  \n",
+       "3            69.419280  \n",
+       "4            84.606845  "
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data= pd.read_csv(\"/kaggle/input/steam-alternator-generator-log-2005-synthetic/steam_alternator_generator_log-2025.csv\")\n",
+    "data.head()"
+   ]
+  }
+ ],
+ "metadata": {
+  "kaggle": {
+   "accelerator": "none",
+   "dataSources": [
+    {
+     "datasetId": 7187875,
+     "sourceId": 11469818,
+     "sourceType": "datasetVersion"
+    }
+   ],
+   "dockerImageVersionId": 31012,
+   "isGpuEnabled": false,
+   "isInternetEnabled": true,
+   "language": "python",
+   "sourceType": "notebook"
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.11"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 6.581989,
+   "end_time": "2025-04-21T08:17:23.309121",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2025-04-21T08:17:16.727132",
+   "version": "2.6.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
